@@ -30,7 +30,7 @@ for(i in 1:nrow(list.of.urls))
 
 	comment_count <- as.numeric(instaPostDF$entry_data$PostPage$media$comments$count)
 	likes_count <- as.numeric(instaPostDF$entry_data$PostPage$media$likes$count)
-	print(comment_count)
+	#print(comment_count)
 
 	video_views = 0
 	is_video <- as.logical(instaPostDF$entry_data$PostPage$media$is_video)
