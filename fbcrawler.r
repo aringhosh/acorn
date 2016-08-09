@@ -39,7 +39,7 @@ for(i in 1:nrow(list.of.urls))
 
 }
 
-colnames(report.df) <- c("url", "id", "pageLikeCount","likeCount", "shareCount", "commentCount", "processedCorrectly")
+colnames(report.df) <- c("url", "id", "reach","likeCount", "shareCount", "commentCount", "processedCorrectly")
 write.csv(report.df, file = "export-fb.csv", row.names = F)
 print("FINISHED! Exported to export-fb.csv")
 
