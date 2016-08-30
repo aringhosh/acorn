@@ -23,6 +23,9 @@ for (i in 1:nrow(df))
 	li_total <- parsedDataframe1$LinkedIn
 	gplus_total <- parsedDataframe1$GooglePlusOne
 
+	if(is.null(fb_total)) fb_total <- 0
+	if(is.null(pintrest_total)) pintrest_total <- 0
+	if(is.null(li_total)) li_total <- 0
 	if(is.null(gplus_total)) gplus_total <- 0
 	
 	#print(paste("Facebook",fb_total))

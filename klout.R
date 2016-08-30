@@ -1,4 +1,5 @@
 library("httr")
+library("jsonlite")
 
 getJSONResponseAsDF <- function(url) {
 	response <- GET(url)
@@ -42,36 +43,53 @@ fetchMyTopics <- function(username)
 
 		t <- getKloutTopicForId(k$id)
 		my.topics <- username
-		for (i in 1:length(t) ) {
-			#print(t[i][[1]]$displayName)
-			my.topics <- c(my.topics, t[i][[1]]$displayName)
+		for (i in 1:5) {
+			#print(t[i][[1]]["displayName"])
+			my.topics <- c(my.topics, t[2][[1]][i])
 		}
+		#print(my.topics)
 		return(my.topics)
 	}
 	
 }
 
+main <- function(){
+  for(i in 1:nrow(usernames))
+  {
+    tryCatch(
+      {
+        username <- usernames[i,]
+        print(paste("fetching",i,"of",nrow(usernames), " = ", username))
+        my.topics <- fetchMyTopics(username)
+        if(is.null(my.topics))
+        {
+          print("ERR")
+          #my.topics <- c(username, "NA", "NA", "NA", "NA", "NA")
+          next
+        }
+        
+        report.df <- rbind(report.df, my.topics)
+        #print(ncol(my.topics))
+        #print(report.df)
+      },
+      warning = function(w) { 
+        print(w)
+      },
+      error = function(e) { 
+        print(e)
+      }
+    )
+    
+    Sys.sleep(1)
+  }
+  
+  return(report.df)
+}
+
 usernames <- read.csv("t_usernames.csv", stringsAsFactors=FALSE)
 report.df <- NULL #data.frame(character(),character(),character(),character(),character(),)
 
-for(i in 1:nrow(usernames))
-{
-	username <- usernames[i,]
-	print(paste("fetching",i,"of",nrow(usernames)))
-	print(username)
-	my.topics <- fetchMyTopics(username)
-	if(is.null(my.topics))
-	{
-		my.topics <- c(username, "NA", "NA", "NA", "NA", "NA")
-	}
-	
-	report.df <- rbind(report.df, my.topics)
-	
-	Sys.sleep(1)
-}
-
-colnames(report.df) <- c("Username", "topic1", "topic2","topic3", "topic4", "topic5")
-write.csv(report.df, file = "export-topics.csv", row.names = F)
-
-
+df <- main()
+colnames(df) <- c("Username", "topic1", "topic2","topic3", "topic4", "topic5")
+write.csv(df, file = "export-topics.csv", row.names = F)
 
