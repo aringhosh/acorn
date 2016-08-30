@@ -1,36 +1,16 @@
+#ref: https://gist.github.com/jonathanmoore/2640302
 library(httr)
 library(jsonlite)
 
 df <- read.csv('bloglist.csv')
-report.df <- data.frame( numeric(), numeric(), numeric() , numeric(), numeric())
+report.df <- data.frame( character(), numeric(), numeric(), numeric() , numeric(), numeric())
 
-url <- "https://free.sharedcount.com/url?"
-apikey <- "11365db3eb1e7220a8d549fcf8161b1d44b4b16e"
+url <- "https://count.donreach.com/"
 
 for (i in 1:nrow(df))
 {
 	blogurl <- df[i,]
-	callURL <- paste(url,"apikey=",apikey,"&url=",blogurl, sep="")
-	
-	print(blogurl)
-
-	r1 <- GET(callURL)
-	jsontext <- content(r1, "text", encoding = "UTF-8")
-	parsedDataframe1 <- fromJSON(jsontext)
-	
-	fb_total <- parsedDataframe1$Facebook$total_count
-	pintrest_total <- parsedDataframe1$Pinterest
-	li_total <- parsedDataframe1$LinkedIn
-	gplus_total <- parsedDataframe1$GooglePlusOne
-
-	if(is.null(fb_total)) fb_total <- 0
-	if(is.null(pintrest_total)) pintrest_total <- 0
-	if(is.null(li_total)) li_total <- 0
-	if(is.null(gplus_total)) gplus_total <- 0
-	
-	#print(paste("Facebook",fb_total))
-	#print(paste("Pintrest",pintrest_total))
-	#print(paste("LinkedIn",li_total))
+	print(paste("fetching",i,"of",nrow(df)))
 
 
 	#stumbleUpon
@@ -43,11 +23,32 @@ for (i in 1:nrow(df))
 	if(is.null(su_views)) su_views <- 0
 	#print(paste("StumbleUpon",su_views))
 
-	row <- c(as.numeric(fb_total),as.numeric(pintrest_total),as.numeric(li_total),as.numeric(su_views), as.numeric(gplus_total))
-	print(row)
+
+	#donreach
+	
+	callURL <- paste(url,"?url=",blogurl, sep="")
+
+	r1 <- GET(callURL)
+	jsontext <- content(r1, "text", encoding = "UTF-8")
+	parsedDataframe2 <- fromJSON(jsontext)
+
+	fb_total <- parsedDataframe2$shares$facebook
+	gplus_total <- parsedDataframe2$shares$google
+	li_total <- parsedDataframe2$shares$linkedin
+	pintrest_total <- parsedDataframe2$shares$pinterest
+
+	if(is.null(fb_total)) fb_total <- 0
+	if(is.null(pintrest_total)) pintrest_total <- 0
+	if(is.null(li_total)) li_total <- 0
+	if(is.null(gplus_total)) gplus_total <- 0
+
+	row <- data.frame(as.character(blogurl), as.numeric(fb_total),as.numeric(pintrest_total),as.numeric(li_total),as.numeric(su_views), as.numeric(gplus_total))
 	report.df <- rbind(report.df, row)
-}
+}	#print(row)
 
 rownames(report.df) <- NULL
-colnames(report.df) <- c("Facebook", "Pinterest", "LinkedIn","Stumble Upon", "Google+")
-write.csv(report.df, file = "social share.csv", row.names = F)
+colnames(report.df) <- c("Blog", "Facebook", "Pinterest", "LinkedIn","Stumble Upon", "Google+")
+write.csv(report.df, file = "export-blog.csv", row.names = F)
+print(report.df[2:6])
+print("Exported to export-blog.csv")
+
