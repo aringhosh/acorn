@@ -5,6 +5,9 @@ library("stringr")
 list.of.urls <- read.csv("instagram_list.csv", stringsAsFactors=FALSE)
 report.df <- data.frame(character(), numeric(), numeric(), logical() , numeric(), numeric())
 
+#helper function
+trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+
 crawlMyInstagram <- function(url)
 {
 	
@@ -23,7 +26,7 @@ crawlMyInstagram <- function(url)
 
 for(i in 1:nrow(list.of.urls))
 {
-	url <- list.of.urls[i,]
+	url <- trim(list.of.urls[i,])
 	#print(url)
 	instaPostDF <- crawlMyInstagram(url)
 
