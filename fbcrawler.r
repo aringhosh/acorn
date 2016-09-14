@@ -1,5 +1,5 @@
-library(rjson)
-library(httr)
+library("jsonlite")
+library("httr")
 
 
 report.df <- data.frame(character(), character(), numeric(), numeric(), numeric(), numeric(), logical())
