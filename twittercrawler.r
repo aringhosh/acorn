@@ -8,7 +8,7 @@ a_sec = "Ru7pwWvE2tTEAuGRRSbk8SXcWEjCBCamQ4PrRJLJY"
 
 setup_twitter_oauth(consumer_key = c_key, consumer_secret = c_sec, access_token = a_tok, access_secret = a_sec)
 
-calculate_RT <- FALSE
+calculate_RT = FALSE
 
 if(calculate_RT){
   print("calculating RT reach") 
@@ -49,12 +49,13 @@ for (i in 1:nrow(list.of.urls))
       {
         rts <- retweeters(st$getId(), n=100)
         rt_count <- length(rts)
+        #print("rts 2")
         
         for(j in 1:rt_count)
         {
           tryCatch(
           {
-            #print(paste(j, "of", rt_count, " - ", rts[j]))
+            print(paste("....RT:: ",j, "of", rt_count, " - ", rts[j]))
             userreach <- getUser(rts[j])$followersCount
             #print(userreach)
             rt_reach <- rt_reach + userreach
