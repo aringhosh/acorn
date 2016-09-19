@@ -23,7 +23,6 @@ for (i in 1:nrow(df))
 	if(is.null(su_views)) su_views <- 0
 	#print(paste("StumbleUpon",su_views))
 
-
 	#donreach
 	
 	callURL <- paste(url,"?url=",blogurl, sep="")
