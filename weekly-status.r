@@ -22,7 +22,7 @@ for (i in 1:nrow(topics_df))
   
   print(paste("processing :", slug))
   
-  #print("begining twitter")
+  print("begining twitter")
   Datasource <- "T"
   param_url <- paste("/reach/weekly?datasource=",Datasource,"&start_date=",start,"&end_date=",end, sep = "")
   callback_url <- paste(base_url,slug,param_url, sep = "")
@@ -31,27 +31,25 @@ for (i in 1:nrow(topics_df))
   parsedDataframe <- fromJSON(jsontext)
   data <- parsedDataframe$reach$data
   T_total <- parsedDataframe$last90
-  no_of_weeks <- length(data)
+  no_of_weeks <- length(parsedDataframe$reach$data$data)
   if(no_of_weeks == 0)
   {
     T_last_week <- T_last_week_per <- 0
-  }
-  else
+  }else
   {
-    T_last_week <- data[[no_of_weeks]]$data
+    T_last_week <- data[no_of_weeks, 2]
 
     if(T_last_week != T_total)
     {
       T_last_week_per <- percent(T_last_week/T_total)  
-    }
-    else
+    }else
     {
       T_last_week_per <- percent(100)
     }
     
   }
   
-  #print("begining INSTAGRAM")
+  print("begining INSTAGRAM")
   Datasource <- "INSTAGRAM"
   param_url <- paste("/reach/weekly?datasource=",Datasource,"&start_date=",start,"&end_date=",end, sep = "")
   callback_url <- paste(base_url,slug,param_url, sep = "")
@@ -60,20 +58,18 @@ for (i in 1:nrow(topics_df))
   parsedDataframe <- fromJSON(jsontext)
   data <- parsedDataframe$reach$data
   I_total <- parsedDataframe$last90
-  no_of_weeks <- length(data)
+  no_of_weeks <- length(parsedDataframe$reach$data$data)
   if(no_of_weeks == 0)
   {
     I_last_week <- I_last_week_per <- 0
-  }
-  else
+  }else
   {
-    I_last_week <- data[[no_of_weeks]]$data
+    I_last_week <- data[no_of_weeks, 2]
 
     if(I_last_week != I_total)
     {
       I_last_week_per <- percent(I_last_week/I_total)  
-    }
-    else
+    }else
     {
       I_last_week_per <- percent(100)
     }
@@ -94,7 +90,25 @@ print(paste("exported to", filename))
 View(report.df)
 
 # part 2: email report
-print("send email now? y/n")
+
+sendMail <- function(filename)
+{
+  #https://github.com/rpremraj/mailR
+  toEmail <- c("kduke@acorninfluence.com", "hhairston@acorninfluence.com", "kvaldez@acorninfluence.com",
+               "sfree@acorninfluence.com", "mhumble@acorninfluence.com")
+  
+  send.mail(from = "report@acorninfluence.com",
+            to = toEmail,
+            cc = c("aghosh@acorninfluence.com"),
+            subject = paste("Campaign reach for the week of", Sys.Date()),
+            body = "Weekly Report is attached. This is an automated email, please do not reply. Contact aghosh@acorninfluence.com for further assistance.",
+            smtp = list(host.name = "aspmx.l.google.com", port = 25),
+            authenticate = FALSE,
+            send = TRUE,
+            debug = TRUE,
+            attach.files = filename)
+}
+
 readOption <- function(){
   n <- readline()
   switch(n,
@@ -107,20 +121,5 @@ readOption <- function(){
           )
 }
 
-sendMail <- function(filename)
-{
-  #https://github.com/rpremraj/mailR
-  toEmail <- c("kduke@acorninfluence.com", "hhairston@acorninfluence.com", "kvaldez@acorninfluence.com",
-    "sfree@acorninfluence.com", "mhumble@acorninfluence.com")
-
-  send.mail(from = "report@acorninfluence.com",
-          to = c(""),
-          cc = c("aghosh@acorninfluence.com"),
-          subject = paste("Campaign reach for the week of", Sys.Date()),
-          body = "Weekly Report is attached. This is an automated email, please do not reply. Contact aghosh@acorninfluence.com for further assistance.",
-          smtp = list(host.name = "aspmx.l.google.com", port = 25),
-          authenticate = FALSE,
-          send = TRUE,
-          debug = TRUE,
-          attach.files = filename)
-}
+print("send email now? y/n")
+readOption()
