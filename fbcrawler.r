@@ -16,8 +16,10 @@ for(i in 1:nrow(list.of.urls))
 	print(paste("fetching",i,"/",nrow(list.of.urls)))
 	fb.post.url <- list.of.urls[i,]
 
-	raw.body <- list(link=c(fb.post.url))
+	raw.body <- list(link=fb.post.url)
 	request.body <- toJSON(raw.body) #convert plain text into JSON text for a key-value pair
+	request.body <- gsub('\\]',"",request.body)
+	request.body <- gsub('\\[',"",request.body)
 
 	r <- POST(url = api_url, add_headers(Authorization = auth.id), content_type_json(), accept("application/vnd.datarank.v1+json"), body = request.body)
 
