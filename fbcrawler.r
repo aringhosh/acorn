@@ -35,13 +35,12 @@ for(i in 1:nrow(list.of.urls))
 	}
 
 	data.frame <- data.frame(as.character(data.frame$url), as.character(data.frame$id),
-	as.numeric(data.frame$pageLikeCount), as.numeric(data.frame$likeCount),
-	as.numeric(data.frame$shareCount), as.numeric(data.frame$commentCount), as.logical(data.frame$processedCorrectly) ) 
+	as.numeric(data.frame$pageLikeCount), as.numeric(data.frame$likeCount), as.numeric(data.frame$commentCount), as.numeric(data.frame$shareCount),  as.logical(data.frame$processedCorrectly) ) 
 	report.df <- rbind(report.df, data.frame)
 
 }
 
-colnames(report.df) <- c("url", "id", "reach","likeCount", "shareCount", "commentCount", "processedCorrectly")
+colnames(report.df) <- c("url", "id", "reach","likeCount", "commentCount", "shareCount", "processedCorrectly")
 write.csv(report.df, file = "export-fb.csv", row.names = F)
 print("FINISHED! Exported to export-fb.csv")
 
