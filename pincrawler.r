@@ -11,7 +11,7 @@ user.api.base.url <- "https://api.pinterest.com/v1/users"
 board.api.base.url <- "https://api.pinterest.com/v1/boards"
 
 #setup output df
-report.df <- data.frame(character(), character(), numeric(), numeric(), numeric(), numeric(), numeric(), numeric())
+report.df <- data.frame(character(), character(), numeric(), numeric(), numeric(), numeric(), numeric(), numeric(), numeric())
 
 #helper function
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
@@ -76,7 +76,7 @@ for(i in 1:nrow(list.of.urls))
   }
   else#(length(boards) > 0)
   {
-    cat( sprintf("found %d repinned boards", nrow(boards)) )
+    cat( sprintf(" found %d repinned boards", nrow(boards)) )
     repins.count <- nrow(boards)
     
     for(j in 1:nrow(boards))
@@ -96,12 +96,13 @@ for(i in 1:nrow(list.of.urls))
   }
   
   #prepare row to export
-  row <- data.frame(as.character(user.username), as.character(url), pin.likes, pin.comments, pin.repins, total.repin.follower, repins.count)
+  total.followers <- user.followers+total.repin.follower
+  row <- data.frame(as.character(user.username), as.character(url), pin.likes, pin.comments, pin.repins, user.followers, total.repin.follower, total.followers, repins.count)
   report.df <- rbind(report.df, row)
 }
 
 #write output csv ; export
-colnames(report.df) <- c("username", "url", "likes", "comments", "repins", "repin follwers", "repin boards")
+colnames(report.df) <- c("username", "url", "likes", "comments", "repins", "user followers", "repin followers", "total followers", "repin boards")
 write.csv(report.df, file = "export-pinterest.csv", row.names = F)
 print("FINISHED! Exported to export-pinterest.csv")
 
