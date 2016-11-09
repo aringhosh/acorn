@@ -38,10 +38,11 @@ for (i in 1:nrow(df))
 		r1 <- GET(callURL)
 		jsontext <- content(r1, "text", encoding = "UTF-8")
 		parsedDataframe <- fromJSON(jsontext)
-
-		channelId <- parsedDataframe$items$snippet$channelId
-		title <- parsedDataframe$items$snippet$title
-		description <- parsedDataframe$items$snippet$description
+    
+		items <- parsedDataframe$items[[1]]
+		channelId <- items$snippet$channelId
+		title <- items$snippet$title
+		description <- items$snippet$description
 
 		#print(channelId)
 		#print(title)
@@ -53,12 +54,13 @@ for (i in 1:nrow(df))
 		r1 <- GET(callURL)
 		jsontext <- content(r1, "text", encoding = "UTF-8")
 		parsedDataframe <- fromJSON(jsontext)
-
-		viewCount <- parsedDataframe$items$statistics$viewCount
+    
+		items <- parsedDataframe$items[[1]]
+		viewCount <- items$statistics$viewCount
 		if (is.null(viewCount)) viewCount = 0
-		likeCount <- parsedDataframe$items$statistics$likeCount
+		likeCount <- items$statistics$likeCount
 		if (is.null(likeCount)) likeCount = 0
-		commentCount <- parsedDataframe$items$statistics$commentCount
+		commentCount <- items$statistics$commentCount
 		if (is.null(commentCount)) commentCount = 0
 
 		#part statistic- (for channel)
@@ -68,7 +70,8 @@ for (i in 1:nrow(df))
 		jsontext <- content(r1, "text", encoding = "UTF-8")
 		parsedDataframe <- fromJSON(jsontext)
 
-		subscriberCount <- parsedDataframe$items$statistics$subscriberCount
+		items <- parsedDataframe$items[[1]]
+		subscriberCount <- items$statistics$subscriberCount
 		#print(subscriberCount)
 
 		# store results
