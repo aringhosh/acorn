@@ -15,7 +15,38 @@ if(calculate_RT){
 } else{
   print("not calculating RT reach")
 }
-  
+
+
+getRTreach <- function(st)
+{
+  rt_reach <- 0
+
+  rts <- retweeters(st$getId(), n=100)
+  print(rts)
+  rt_count <- length(rts)
+  print(sprintf("%d RTs", rt_count))
+        
+        for(j in 1:rt_count)
+        {
+          tryCatch(
+          {
+            print(paste("RT:: ",j, "of", rt_count))
+            userreach <- getUser(rts[j])$followersCount
+            #print(sprintf(" reach %d", userreach))
+            rt_reach <- rt_reach + userreach
+          },warning = function(w) { 
+            #print("warning")
+          }
+          ,error = function(e) { 
+            print(paste("ERR:: ", rts[j]))
+            #print(rts)
+          }
+          )
+        }
+
+  print(sprintf("total RT reach : %d", rt_reach))
+  return (rt_reach)
+}
 
 #helper function
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
@@ -28,7 +59,7 @@ for (i in 1:nrow(list.of.urls))
   fav <- 0
   rt <- 0
   reach <- 0
-  rt_reach <- 0
+  reach2 <- 0
 
   status.url<- trim(list.of.urls[i,1])
   print(paste(i, " of ", nrow(list.of.urls)))
@@ -47,26 +78,7 @@ for (i in 1:nrow(list.of.urls))
       #RT reach count
       if(calculate_RT)
       {
-        rts <- retweeters(st$getId(), n=100)
-        rt_count <- length(rts)
-        #print("rts 2")
-        
-        for(j in 1:rt_count)
-        {
-          tryCatch(
-          {
-            print(paste("....RT:: ",j, "of", rt_count, " - ", rts[j]))
-            userreach <- getUser(rts[j])$followersCount
-            #print(userreach)
-            rt_reach <- rt_reach + userreach
-          },warning = function(w) { 
-            #print("warning")
-          }
-          ,error = function(e) { 
-            print(paste("ERR:: ", rts[j]))
-          }
-          )
-        }
+        reach2 <- getRTreach(st)
       }
       
     },
@@ -77,9 +89,9 @@ for (i in 1:nrow(list.of.urls))
       }
     )
 
-  row <- data.frame(status.url, fav, rt, reach, rt_reach)
+  row <- data.frame(status.url, fav, rt, reach, reach2)
   report.df <- rbind(report.df, row)
-  print(paste("fav: ", fav," RT: ", rt, " reach: ", reach, "RT Reach:", rt_reach))
+  print(paste("fav: ", fav," RT: ", rt, " reach: ", reach, "RT Reach:", reach2))
 }
 
 rownames(report.df) <- NULL
