@@ -13,10 +13,13 @@ error.count <- 0
 
 for(i in 1:nrow(list.of.urls))
 {
+	
 	print(paste("fetching",i,"/",nrow(list.of.urls)))
 	fb.post.url <- list.of.urls[i,]
 
-	raw.body <- list(link=fb.post.url)
+	tryCatch(
+    {
+    	raw.body <- list(link=fb.post.url)
 	request.body <- toJSON(raw.body) #convert plain text into JSON text for a key-value pair
 	request.body <- gsub('\\]',"",request.body)
 	request.body <- gsub('\\[',"",request.body)
@@ -34,9 +37,17 @@ for(i in 1:nrow(list.of.urls))
 		error.count <- error.count + 1
 	}
 
-	data.frame <- data.frame(as.character(data.frame$url), as.character(data.frame$id),
+	row <- data.frame(as.character(data.frame$url), as.character(data.frame$id),
 	as.numeric(data.frame$pageLikeCount), as.numeric(data.frame$likeCount), as.numeric(data.frame$commentCount), as.numeric(data.frame$shareCount),  as.logical(data.frame$processedCorrectly) ) 
-	report.df <- rbind(report.df, data.frame)
+	report.df <- rbind(report.df, row)
+    },
+    warning = function(w) {
+        #print("warning")
+    },error = function(e) { 
+        print(paste("ERR:: ", fb.post.url))
+      }
+    )
+	
 
 }
 
