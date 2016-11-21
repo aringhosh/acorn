@@ -1,5 +1,5 @@
 library(XLConnect)
-wb <- loadWorkbook("PA sheet.xlsx")
+wb <- loadWorkbook("pa-report/PA sheet.xlsx")
 sheetName <- "new campaign value"
 
 
@@ -17,9 +17,10 @@ insta.poc <- nrow(insta.data)
 pin.poc <- nrow(pin.data)
 twitter.poc <- nrow(twitter.data)
 youtube.poc <- nrow(youtube.data)
+snap.poc <- 0
 blog.poc <- nrow(blog.data)
 
-poc <- c(fb.poc, insta.poc, pin.poc, pin.poc, twitter.poc, youtube.poc, blog.poc)
+poc <- c(fb.poc, insta.poc, pin.poc, twitter.poc, youtube.poc, snap.poc, blog.poc)
 poc <- data.frame(poc)
 writeWorksheet(wb,poc,sheetName,startRow = 4, startCol = 2, header = FALSE)
 

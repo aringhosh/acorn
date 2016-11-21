@@ -1,4 +1,4 @@
-df <- read.csv('links.csv', stringsAsFactors = F)
+df <- read.csv('pa-report/links.csv', stringsAsFactors = F)
 
 fb.pattern <- ".facebook|fb.co."
 insta.pattern = ".instagram."
