@@ -3,7 +3,7 @@ library(httr)
 library(jsonlite)
 
 df <- read.csv('bloglist.csv')
-report.df <- data.frame( character(), numeric(), numeric(), numeric() , numeric(), numeric())
+report.df <- data.frame( character(), numeric(), numeric(), numeric() , numeric(), numeric(), numeric())
 
 url <- "https://count.donreach.com/"
 
@@ -21,6 +21,7 @@ for (i in 1:nrow(df))
 
 	su_views <- parsedDataframe$result$views
 	if(is.null(su_views)) su_views <- 0
+	su_views <- as.numeric(su_views)
 	#print(paste("StumbleUpon",su_views))
 
 	#donreach
@@ -41,12 +42,14 @@ for (i in 1:nrow(df))
 	if(is.null(li_total)) li_total <- 0
 	if(is.null(gplus_total)) gplus_total <- 0
 
-	row <- data.frame(as.character(blogurl), as.numeric(fb_total),as.numeric(pintrest_total),as.numeric(li_total),as.numeric(su_views), as.numeric(gplus_total))
+	t.social_share <- fb_total+pintrest_total+li_total+su_views+gplus_total
+
+	row <- data.frame(as.character(blogurl), as.numeric(fb_total),as.numeric(pintrest_total),as.numeric(li_total),as.numeric(su_views), as.numeric(gplus_total), t.social_share)
 	report.df <- rbind(report.df, row)
 }	#print(row)
 
 rownames(report.df) <- NULL
-colnames(report.df) <- c("Blog", "Facebook", "Pinterest", "LinkedIn","Stumble Upon", "Google+")
+colnames(report.df) <- c("Blog", "Facebook", "Pinterest", "LinkedIn","Stumble Upon", "Google+", "total_social_share")
 write.csv(report.df, file = "export-blog.csv", row.names = F)
 print(report.df[2:6])
 print("Exported to export-blog.csv")
