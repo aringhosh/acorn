@@ -70,3 +70,4 @@ print(sprintf("twitter : %d", nrow(twitter.df)))
 print(sprintf("youtube : %d", nrow(youtube.df)))
 print(sprintf("blog : %d", nrow(blog.df)))
 print("finished exporting to input csv")
+
