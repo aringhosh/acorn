@@ -6,11 +6,17 @@ sheetName <- "new campaign value"
 
 #read all the input files
 fb.data <- read.csv("export-fb.csv")
+colnames(fb.data)[1] <- "url"
 insta.data <- read.csv("export-instagram.csv")
+colnames(insta.data)[1] <- "url"
 pin.data <- read.csv("export-pinterest.csv")
+#colnames(pin.data)[1] <- "url" (pin already has the name as column)
 twitter.data <- read.csv("export-twitter.csv")
+colnames(twitter.data)[1] <- "url"
 blog.data <- read.csv("export-blog.csv")
+colnames(blog.data)[1] <- "url"
 youtube.data <- read.csv("export-youtube.csv")
+colnames(youtube.data)[1] <- "url"
 
 fb.poc <- nrow(fb.data) 
 insta.poc <- nrow(insta.data)
@@ -28,22 +34,27 @@ writeWorksheet(wb,poc,sheetName,startRow = 4, startCol = 2, header = FALSE)
 fb.likes <- sum(fb.data$likeCount)
 fb.comments <- sum(fb.data$commentCount)
 fb.shares <- sum(fb.data$shareCount)
-
+fb.data["eng"] <- fb.data$commentCount + fb.data$likeCount + fb.data$shareCount
+  
 insta.likes <- sum(insta.data$Likes)
 insta.comments <- sum(insta.data$Comments)
+insta.data["eng"] <- insta.data$Likes + insta.data$Comments + insta.data$Video.Views
 
 pin.likes <- sum(pin.data$likes)
 pin.repins <- sum(pin.data$repins)
 pin.comments <- sum(pin.data$comments)
+pin.data["eng"] <- pin.data$likes + pin.data$repins+ pin.data$comments
 
 twit.favs <- sum(twitter.data$fav)
 twit.rts <- sum(twitter.data$retweets)
+twitter.data["eng"] <- twitter.data$fav + twitter.data$retweets
 
 blog.comment <- 0
 blog.shares <- sum(blog.data$TOTAL.sum.)
 
 youtube.views <- sum(youtube.data$view)
 youtube.comments <- sum(youtube.data$comments)
+youtube.data["eng"] <- youtube.data$view # youtube views here
 
 fb.video.views <- 0
 insta.video.views <- sum(insta.data$Video.Views)
@@ -61,8 +72,31 @@ youtube.reach <- sum(youtube.data$reach)
 
 reach <- c(fb.reach, insta.reach, pin.reach, twitter.reach, youtube.reach)
 reach <- data.frame(reach)
-writeWorksheet(wb,reach,sheetName,startRow = 5, startCol = 7, header = FALSE)
 
 #write to excel
+writeWorksheet(wb,reach,sheetName,startRow = 5, startCol = 7, header = FALSE)
 setForceFormulaRecalculation(wb, sheetName, T)
+
+#standout contents
+fb.standout <- fb.data[order(fb.data$eng, decreasing = T),][1:3 ,c("url","eng")]
+insta.standout <- insta.data[order(insta.data$eng, decreasing = T),][1:3 ,c("url","eng")]
+pin.standout <- pin.data[order(pin.data$eng, decreasing = T),][1:3 ,c("url","eng")]
+twitter.standout <- twitter.data[order(twitter.data$eng, decreasing = T),][1:3 ,c("url","eng")]
+youtube.standout <- youtube.data[order(youtube.data$eng, decreasing = T),][1:3 ,c("url","eng")]
+colnames(blog.data)[ncol(blog.data)] <- "eng"
+blog.standout <- blog.data[order(blog.data$eng, decreasing = T),][1:3 ,c("url","eng")]
+
+fb.standout["type"] <- "FB"
+insta.standout["type"] <- "INSTAGRAM"
+pin.standout["type"] <- "PIN"
+twitter.standout["type"] <- "TWITTER"
+youtube.standout["type"] <- "YOUTUBE"
+blog.standout["type"] <- "BLOG"
+
+standout.sheet.name <- "standout contents"
+writeWorksheet(wb,rbind(fb.standout, insta.standout, pin.standout, twitter.standout, youtube.standout, blog.standout),standout.sheet.name,startRow = 1, startCol = 1, header = TRUE)
+
+#save changes
 saveWorkbook(wb)
+print("finished exporting PA")
+
