@@ -44,7 +44,7 @@ for(i in 1:nrow(list.of.urls))
   tryCatch(
     {
       #read from input csv file
-      print(paste("fetching",i,"of",nrow(list.of.urls)))
+      print(paste("PIN fetching",i,"of",nrow(list.of.urls)))
       #first make sure that the last char in url is /
       if(!endsWith(url, "/")) url <- sprintf("%s%s", url, "/")
       pin.id <- get.pin.id(url)

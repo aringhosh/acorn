@@ -14,7 +14,7 @@ error.count <- 0
 for(i in 1:nrow(list.of.urls))
 {
   
-  print(paste("fetching",i,"/",nrow(list.of.urls)))
+  print(paste("FB fetching",i,"/",nrow(list.of.urls)))
   fb.post.url <- list.of.urls[i,]
   
   tryCatch(

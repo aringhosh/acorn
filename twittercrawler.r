@@ -62,7 +62,7 @@ for (i in 1:nrow(list.of.urls))
   reach2 <- 0
 
   status.url<- trim(list.of.urls[i,1])
-  print(paste(i, " of ", nrow(list.of.urls)))
+  print(paste("TWIT", i, " of ", nrow(list.of.urls)))
   #print( paste("url: ", status.url))
 
   tryCatch(

@@ -13,7 +13,7 @@ for (i in 1:nrow(df))
 	youtubeURL <- df[i,]
 	parsedURL <- parse_url(youtubeURL)
 	videoid <- NULL
-	print(paste("fetching",i,"of",nrow(df)))
+	print(paste("YOUTUBE fetching",i,"of",nrow(df)))
 
 	if(!is.null(parsedURL$query$v))
 	{

@@ -10,7 +10,7 @@ url <- "https://count.donreach.com/"
 for (i in 1:nrow(df))
 {
 	blogurl <- df[i,]
-	print(paste("fetching",i,"of",nrow(df)))
+	print(paste("BLOG fetching",i,"of",nrow(df)))
 
 
 	#stumbleUpon

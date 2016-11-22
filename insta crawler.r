@@ -30,7 +30,7 @@ for(i in 1:nrow(list.of.urls))
 	#print(url)
 	instaPostDF <- crawlMyInstagram(url)
 
-	print(paste("fetching",i,"of",nrow(list.of.urls)))
+	print(paste("INSTA fetching",i,"of",nrow(list.of.urls)))
 	#determine public/private profile
 	if(length(instaPostDF$entry_data) != 0)
 	{
