@@ -56,7 +56,7 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 #twitteR::getCurRateLimitInfo("users")
 
 list.of.urls <- read.csv("twitter_list.csv", stringsAsFactors=FALSE)
-report.df <- data.frame(character(), numeric(), numeric(), numeric(), numeric())
+report.df <- data.frame(character(), numeric(), numeric(), numeric(), numeric(), character())
 
 for (i in 1:nrow(list.of.urls))
 {
@@ -78,6 +78,7 @@ for (i in 1:nrow(list.of.urls))
       rt <- st$retweetCount
       u <- getUser(st$screenName)
       reach <- u$followersCount
+      created <- st$created
       
       #RT reach count
       if(calculate_RT)
@@ -93,7 +94,7 @@ for (i in 1:nrow(list.of.urls))
       }
     )
 
-  row <- data.frame(status.url, fav, rt, reach, reach2)
+  row <- data.frame(status.url, fav, rt, reach, reach2, created)
   report.df <- rbind(report.df, row)
   print(paste("fav: ", fav," RT: ", rt, " reach: ", reach, "RT Reach:", reach2))
 
@@ -101,6 +102,6 @@ for (i in 1:nrow(list.of.urls))
 }
 
 rownames(report.df) <- NULL
-colnames(report.df) <- c("twitter", "fav", "retweets","reach", "rt reach")
+colnames(report.df) <- c("twitter", "fav", "retweets","reach", "rt reach", "created")
 write.csv(report.df, file = "export-twitter.csv", row.names = F)
 print("finished exporting results to export-twitter.csv")
