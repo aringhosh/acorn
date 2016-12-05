@@ -34,7 +34,7 @@ writeWorksheet(wb,poc,sheetName,startRow = 4, startCol = 2, header = FALSE)
 fb.likes <- sum(fb.data$fb_reaction_total)
 fb.comments <- sum(fb.data$fb_comment)
 fb.shares <- sum(fb.data$fb_shares)
-fb.data$eng <- as.vector(fb.data$fb_eng) #convert into vector to be used with order()
+fb.data$eng <- as.vector(fb.data$eng) #convert into vector to be used with order()
   
 insta.likes <- sum(insta.data$Likes)
 insta.comments <- sum(insta.data$Comments)
