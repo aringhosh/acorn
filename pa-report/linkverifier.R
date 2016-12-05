@@ -69,5 +69,6 @@ print(sprintf("pinterest : %d", nrow(pin.df)))
 print(sprintf("twitter : %d", nrow(twitter.df)))
 print(sprintf("youtube : %d", nrow(youtube.df)))
 print(sprintf("blog : %d", nrow(blog.df)))
-print("finished exporting to input csv")
+total.links <- sum(nrow(fb.df), nrow(insta.df), nrow(pin.df), nrow(twitter.df), nrow(youtube.df), nrow(blog.df))
+print(paste0("total links exported to csvs: ", total.links))
 
