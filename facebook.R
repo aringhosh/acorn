@@ -3,7 +3,7 @@ library(httr)
 graph_api_base <-"https://graph.facebook.com/v2.8"
 access_token <- "EAACEdEose0cBAI0iCAK1Ut66M4gPMVhBv670RJvt71SBX7nk3qjwBk3Wg1JeAPuCMvfqRb61pwjHuVLqJZAVzS8yUPjKq7ZBAqKyQ6ZAe4SowBkZCM6rxZAAx6P0vXMHM93wbZCkkerwYuFg3AMUzNlF4mzoPVcvezXZCu9sbeNMAZDZD"
 
-export.result <- data.frame(link=character(), time=character(), share=numeric(), coment=numeric(), id=character(), like=numeric(), love=numeric(), wow=numeric(), haha=numeric(), sad=numeric(), angry=numeric(), thankful=numeric(), total_reaction=numeric(), reach=numeric(), success=character())
+export.result <- data.frame(link=character(), created=character(), share=numeric(), coment=numeric(), id=character(), like=numeric(), love=numeric(), wow=numeric(), haha=numeric(), sad=numeric(), angry=numeric(), thankful=numeric(), total_reaction=numeric(), reach=numeric(), success=character())
 df <- read.csv('fb_list.csv')
 for (i in 1:nrow(df))
 {

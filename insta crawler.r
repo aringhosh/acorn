@@ -3,7 +3,7 @@ library("jsonlite")
 library("stringr")
 
 list.of.urls <- read.csv("instagram_list.csv", stringsAsFactors=FALSE)
-report.df <- data.frame(character(), numeric(), numeric(), logical() , numeric(), numeric())
+report.df <- data.frame(character(), numeric(), numeric(), logical() , numeric(), numeric(), character())
 
 #helper function
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
@@ -48,6 +48,8 @@ for(i in 1:nrow(list.of.urls))
 		}
 
 		username <- as.character(instaPostDF$entry_data$PostPage$media$owner$username)
+		d <- instaPostDF$entry_data$PostPage$media$date
+		created <- as.POSIXct(d, origin="1970-01-01")
 
 		#create the profile URL
 		instaProfileURL <- paste("https://www.instagram.com/",username, sep="")
@@ -56,7 +58,7 @@ for(i in 1:nrow(list.of.urls))
 		#print(followed_by)
 
 		#warning, don't use concatenate c() here, use data.frame
-		row <- data.frame(as.character(url), comment_count, likes_count, is_video, video_views, followed_by)
+		row <- data.frame(as.character(url), comment_count, likes_count, is_video, video_views, followed_by, created)
 		#print(row)
 		report.df <- rbind(report.df, row)
 	}
@@ -68,6 +70,6 @@ for(i in 1:nrow(list.of.urls))
 	
 }
 
-colnames(report.df) <- c("Link", "Comments", "Likes","is_video", "Video Views", "Reach")
+colnames(report.df) <- c("Link", "Comments", "Likes","is_video", "Video Views", "Reach", "created")
 write.csv(report.df, file = "export-instagram.csv", row.names = F)
 print("FINISHED! Exported to export-instagram.csv")
