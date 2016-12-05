@@ -31,10 +31,10 @@ poc <- data.frame(poc)
 writeWorksheet(wb,poc,sheetName,startRow = 4, startCol = 2, header = FALSE)
 
 #engagements
-fb.likes <- sum(fb.data$likeCount)
-fb.comments <- sum(fb.data$commentCount)
-fb.shares <- sum(fb.data$shareCount)
-fb.data["eng"] <- fb.data$commentCount + fb.data$likeCount + fb.data$shareCount
+fb.likes <- sum(fb.data$fb_reaction_total)
+fb.comments <- sum(fb.data$fb_comment)
+fb.shares <- sum(fb.data$fb_shares)
+fb.data$eng <- as.vector(fb.data$fb_eng) #convert into vector to be used with order()
   
 insta.likes <- sum(insta.data$Likes)
 insta.comments <- sum(insta.data$Comments)
@@ -54,26 +54,28 @@ blog.shares <- sum(blog.data$TOTAL.sum.)
 
 youtube.views <- sum(youtube.data$view)
 youtube.comments <- sum(youtube.data$comments)
+youtube.likes <- sum(youtube.data$like)
 youtube.data["eng"] <- youtube.data$view # youtube views here
 
 fb.video.views <- 0
 insta.video.views <- sum(insta.data$Video.Views)
 
-engagements <- c(fb.likes, fb.comments, fb.shares, insta.likes, insta.comments, pin.likes, pin.repins, pin.comments, twit.favs, twit.rts, blog.comment, blog.shares, youtube.views, youtube.comments, fb.video.views, insta.video.views)
+engagements <- c(fb.likes, fb.comments, fb.shares, insta.likes, insta.comments, pin.likes, pin.repins, pin.comments, twit.favs, twit.rts, blog.comment, blog.shares, youtube.views, youtube.likes, youtube.comments, fb.video.views, insta.video.views)
 engagements <- data.frame(engagements)
 writeWorksheet(wb,engagements,sheetName,startRow = 15, startCol = 2, header = FALSE)
 
 #reach
-fb.reach <- sum(fb.data$reach)
+fb.reach <- sum(fb.data$page_fan_count)
 insta.reach <- sum(insta.data$Reach)
 pin.reach <- sum(pin.data$total.followers)
-twitter.reach <- 0
+twitter.reach <- sum(twitter.data$reach, twitter.data$rt.reach)
 youtube.reach <- sum(youtube.data$reach)
 
 reach <- c(fb.reach, insta.reach, pin.reach, twitter.reach, youtube.reach)
 reach <- data.frame(reach)
 
 #write to excel
+print("exporting PA calc")
 writeWorksheet(wb,reach,sheetName,startRow = 5, startCol = 7, header = FALSE)
 setForceFormulaRecalculation(wb, sheetName, T)
 
@@ -93,8 +95,9 @@ twitter.standout["type"] <- "TWITTER"
 youtube.standout["type"] <- "YOUTUBE"
 blog.standout["type"] <- "BLOG"
 
+print("exporting standout contents")
 standout.sheet.name <- "standout contents"
-writeWorksheet(wb,rbind(fb.standout, insta.standout, pin.standout, twitter.standout, youtube.standout, blog.standout),standout.sheet.name,startRow = 1, startCol = 1, header = TRUE)
+writeWorksheet(wb,rbind(fb.standout, insta.standout, pin.standout, twitter.standout, youtube.standout, blog.standout), standout.sheet.name, startRow = 1, startCol = 1, header = TRUE)
 
 #save changes
 saveWorkbook(wb)
