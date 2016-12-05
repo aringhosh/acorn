@@ -95,5 +95,9 @@ for (i in 1:nrow(df))
 }
 
 print(export.result)
+#engagement
+export.result["eng"] <- export.result$fb_shares + export.result$fb_comment + export.result$fb_reaction_total
+write.csv(export.result, file = "export-fb.csv", row.names = F)
+print("FINISHED! Exported to export-fb.csv")
 
 
