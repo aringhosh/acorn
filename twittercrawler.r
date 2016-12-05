@@ -52,6 +52,9 @@ getRTreach <- function(id)
 #helper function
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
+#check current rate limit using this
+#twitteR::getCurRateLimitInfo("users")
+
 list.of.urls <- read.csv("twitter_list.csv", stringsAsFactors=FALSE)
 report.df <- data.frame(character(), numeric(), numeric(), numeric(), numeric())
 
@@ -93,6 +96,8 @@ for (i in 1:nrow(list.of.urls))
   row <- data.frame(status.url, fav, rt, reach, reach2)
   report.df <- rbind(report.df, row)
   print(paste("fav: ", fav," RT: ", rt, " reach: ", reach, "RT Reach:", reach2))
+
+  Sys.sleep(1) #make sure 900 API calls/ 15 mins
 }
 
 rownames(report.df) <- NULL
