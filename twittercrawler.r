@@ -14,11 +14,11 @@ setup_twitter_oauth(consumer_key = c_key, consumer_secret = c_sec, access_token 
 #Use basic auth
 secret <- jsonlite::base64_enc(paste(c_key, c_sec, sep = ":"))
 req <- httr::POST("https://api.twitter.com/oauth2/token",
-  httr::add_headers(
-    "Authorization" = paste("Basic", gsub("\n", "", secret)),
-    "Content-Type" = "application/x-www-form-urlencoded;charset=UTF-8"
-  ),
-  body = "grant_type=client_credentials"
+                  httr::add_headers(
+                    "Authorization" = paste("Basic", gsub("\n", "", secret)),
+                    "Content-Type" = "application/x-www-form-urlencoded;charset=UTF-8"
+                  ),
+                  body = "grant_type=client_credentials"
 );
 
 #Extract the access token
@@ -58,47 +58,52 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 list.of.urls <- read.csv("twitter_list.csv", stringsAsFactors=FALSE)
 report.df <- data.frame(character(), numeric(), numeric(), numeric(), numeric(), character())
 
-for (i in 1:nrow(list.of.urls))
+if(nrow(list.of.urls) != 0) #only if there is any link to analyze
 {
-  fav <- 0
-  rt <- 0
-  reach <- 0
-  reach2 <- 0
-
-  status.url<- trim(list.of.urls[i,1])
-  print(paste("TWIT", i, " of ", nrow(list.of.urls)))
-  #print( paste("url: ", status.url))
-
-  tryCatch(
-    {
-      split <- str_split(status.url,"/")
-      status_id <- split[[1]][length(split[[1]])]
-      st <- showStatus(status_id)
-      fav <- st$favoriteCount
-      rt <- st$retweetCount
-      u <- getUser(st$screenName)
-      reach <- u$followersCount
-      created <- st$created
-      
-      #RT reach count
-      if(calculate_RT)
+  for (i in 1:nrow(list.of.urls))
+  {
+    fav <- 0
+    rt <- 0
+    reach <- 0
+    reach2 <- 0
+    
+    status.url<- trim(list.of.urls[i,1])
+    print(paste("TWIT", i, " of ", nrow(list.of.urls)))
+    #print( paste("url: ", status.url))
+    
+    tryCatch(
       {
-        reach2 <- getRTreach(status_id)
-      }
-      
-    },
-    warning = function(w) { 
+        split <- str_split(status.url,"/")
+        status_id <- split[[1]][length(split[[1]])]
+        st <- showStatus(status_id)
+        fav <- st$favoriteCount
+        rt <- st$retweetCount
+        u <- getUser(st$screenName)
+        reach <- u$followersCount
+        created <- st$created
+        
+        #RT reach count
+        if(calculate_RT)
+        {
+          reach2 <- getRTreach(status_id)
+        }
+        
+      },
+      warning = function(w) { 
         #print("warning")
-    },error = function(e) { 
+      },error = function(e) { 
         print(paste("ERR:: ", e, status.url))
       }
     )
-
-  row <- data.frame(status.url, fav, rt, reach, reach2, created)
-  report.df <- rbind(report.df, row)
-  print(paste("fav: ", fav," RT: ", rt, " reach: ", reach, "RT Reach:", reach2))
-
-  Sys.sleep(1) #make sure 900 API calls/ 15 mins
+    
+    row <- data.frame(status.url, fav, rt, reach, reach2, created)
+    report.df <- rbind(report.df, row)
+    print(paste("fav: ", fav," RT: ", rt, " reach: ", reach, "RT Reach:", reach2))
+    
+    Sys.sleep(1) #make sure 900 API calls/ 15 mins
+  }
+}else{
+  print("No Twitter links present - exporting empty data frame")
 }
 
 rownames(report.df) <- NULL

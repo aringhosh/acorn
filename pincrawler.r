@@ -11,7 +11,7 @@ user.api.base.url <- "https://api.pinterest.com/v1/users"
 board.api.base.url <- "https://api.pinterest.com/v1/boards"
 
 #setup output df
-report.df <- data.frame(character(), character(), numeric(), numeric(), numeric(), numeric(), numeric(), numeric(), numeric())
+report.df <- data.frame(character(), character(), numeric(), numeric(), numeric(), numeric(), numeric(), numeric(), numeric(), character())
 
 #helper function
 trim <- function (x) gsub("^\\s+|\\s+$", "", x)
@@ -29,110 +29,116 @@ get.source <- function(x)
 
 list.of.urls <- read.csv("pins_list.csv", stringsAsFactors=FALSE)
 
-for(i in 1:nrow(list.of.urls))
+if(nrow(list.of.urls) != 0) #only if there is any link to analyze
 {
-  user.username <- "n/a"
-  url <- trim(list.of.urls[i,])
-  pin.likes <- 0
-  pin.comments <- 0
-  pin.repins <- 0
-  user.followers <- 0
-  total.repin.follower <- 0 
-  total.followers <- 0 
-  repins.count <- 0
-  
-  tryCatch(
-    {
-      #read from input csv file
-      print(paste("PIN fetching",i,"of",nrow(list.of.urls)))
-      #first make sure that the last char in url is /
-      if(!endsWith(url, "/")) url <- sprintf("%s%s", url, "/")
-      pin.id <- get.pin.id(url)
-      
-      #pin calc
-      pin.api.count.api <- sprintf("%s/%s/?fields=counts,creator&access_token=%s", pin.api.base.url, pin.id, pin.access.token)
-      json.resp <- get.source(pin.api.count.api)
-      result.df <- fromJSON(json.resp)
-      
-      if(!is.null(result.df$message) && result.df$message == "Pin not found.")
+  for(i in 1:nrow(list.of.urls))
+  {
+    user.username <- "n/a"
+    url <- trim(list.of.urls[i,])
+    pin.likes <- 0
+    pin.comments <- 0
+    pin.repins <- 0
+    user.followers <- 0
+    total.repin.follower <- 0 
+    total.followers <- 0 
+    repins.count <- 0
+    
+    tryCatch(
       {
-        #sometihng wrong with the pin url (e.g. it no longer exists)
-        row <- data.frame(as.character(user.username), as.character(url), pin.likes, pin.comments, pin.repins, user.followers, total.repin.follower, total.followers, repins.count)
-        report.df <- rbind(report.df, row)
-        next
-      }
-      
-      pin.likes <- result.df$data$counts$likes
-      pin.comments <- result.df$data$counts$comments
-      pin.repins <- result.df$data$counts$repins
-      pin.user.id <- result.df$data$creator$id
-      
-      #print(sprintf("like -%d comment -%d repins -%d", pin.likes, pin.comments, pin.repins))
-      
-      #user calc
-      user.api.count.api <- sprintf("%s/%s/?fields=username,counts&access_token=%s", user.api.base.url, pin.user.id, pin.access.token)
-      json.resp <- get.source(user.api.count.api)
-      result.df <- fromJSON(json.resp)
-      user.followers <- result.df$data$counts$followers
-      user.username <- result.df$data$username
-      
-      #print(sprintf("username %s followers %d", user.username, user.followers))
-      
-      #repin calc
-      repin.url <- sprintf("%s%s",url,"repins/") #assuming the url ends with /
-      r <- get.source(repin.url)
-      resourceDataCache.json <- strsplit(r, startElement)
-      resourceDataCache.json <- strsplit(resourceDataCache.json[[1]][2], endElement)
-      resourceDataCache.json <- trim(resourceDataCache.json[[1]][1]) #still start with tree : & ends with ,
-      resourceDataCache.json <- substr(resourceDataCache.json,nchar("\"\"tree\": "), nchar(resourceDataCache.json)-1)
-      boards <- fromJSON(resourceDataCache.json)$data
-      
-      total.repin.follower <- 0
-      repins.count <- 0
-      
-      if(length(boards) == 0)
-      {
-        print("no repin boards found!")
-      }
-      else#(length(boards) > 0)
-      {
-        cat( sprintf(" found %d repinned boards", nrow(boards)) )
-        repins.count <- nrow(boards)
+        #read from input csv file
+        print(paste("PIN fetching",i,"of",nrow(list.of.urls)))
+        #first make sure that the last char in url is /
+        if(!endsWith(url, "/")) url <- sprintf("%s%s", url, "/")
+        pin.id <- get.pin.id(url)
         
-        for(j in 1:nrow(boards))
+        #pin calc
+        pin.api.count.api <- sprintf("%s/%s/?fields=counts,created_at,creator&access_token=%s", pin.api.base.url, pin.id, pin.access.token)
+        json.resp <- get.source(pin.api.count.api)
+        result.df <- fromJSON(json.resp)
+        
+        if(!is.null(result.df$message) && result.df$message == "Pin not found.")
         {
-          #board.id <- "60446888687716253"
-          board.id <- boards$id[j]
-          board.count.url <- sprintf("%s/%s/?fields=counts&access_token=%s", board.api.base.url,board.id,pin.access.token)
-          response <- GET(board.count.url)
-          response <- content(response, "text", encoding = "UTF-8")
-          api.response <- fromJSON(response)
-          
-          #print(api.response$data$counts$followers)
-          total.repin.follower <- total.repin.follower + api.response$data$counts$followers
+          #sometihng wrong with the pin url (e.g. it no longer exists)
+          row <- data.frame(as.character(user.username), as.character(url), pin.likes, pin.comments, pin.repins, user.followers, total.repin.follower, total.followers, repins.count)
+          report.df <- rbind(report.df, row)
+          next
         }
         
-        print(sprintf("finished all repin boards. total repin follower is %d", total.repin.follower))
+        pin.likes <- result.df$data$counts$likes
+        pin.comments <- result.df$data$counts$comments
+        pin.repins <- result.df$data$counts$repins
+        pin.user.id <- result.df$data$creator$id
+        pin.created <- result.df$data$created_at
+        
+        #print(sprintf("like -%d comment -%d repins -%d", pin.likes, pin.comments, pin.repins))
+        
+        #user calc
+        user.api.count.api <- sprintf("%s/%s/?fields=username,counts&access_token=%s", user.api.base.url, pin.user.id, pin.access.token)
+        json.resp <- get.source(user.api.count.api)
+        result.df <- fromJSON(json.resp)
+        user.followers <- result.df$data$counts$followers
+        user.username <- result.df$data$username
+        
+        #print(sprintf("username %s followers %d", user.username, user.followers))
+        
+        #repin calc
+        repin.url <- sprintf("%s%s",url,"repins/") #assuming the url ends with /
+        r <- get.source(repin.url)
+        resourceDataCache.json <- strsplit(r, startElement)
+        resourceDataCache.json <- strsplit(resourceDataCache.json[[1]][2], endElement)
+        resourceDataCache.json <- trim(resourceDataCache.json[[1]][1]) #still start with tree : & ends with ,
+        resourceDataCache.json <- substr(resourceDataCache.json,nchar("\"\"tree\": "), nchar(resourceDataCache.json)-1)
+        boards <- fromJSON(resourceDataCache.json)$data
+        
+        total.repin.follower <- 0
+        repins.count <- 0
+        
+        if(length(boards) == 0)
+        {
+          print("no repin boards found!")
+        }
+        else#(length(boards) > 0)
+        {
+          cat( sprintf(" found %d repinned boards", nrow(boards)) )
+          repins.count <- nrow(boards)
+          
+          for(j in 1:nrow(boards))
+          {
+            #board.id <- "60446888687716253"
+            board.id <- boards$id[j]
+            board.count.url <- sprintf("%s/%s/?fields=counts&access_token=%s", board.api.base.url,board.id,pin.access.token)
+            response <- GET(board.count.url)
+            response <- content(response, "text", encoding = "UTF-8")
+            api.response <- fromJSON(response)
+            
+            #print(api.response$data$counts$followers)
+            total.repin.follower <- total.repin.follower + api.response$data$counts$followers
+          }
+          
+          print(sprintf("finished all repin boards. total repin follower is %d", total.repin.follower))
+        }
+      },warning = function(w) { 
+        #print("warning")
       }
-    },warning = function(w) { 
-      #print("warning")
-    }
-    ,error = function(e) { 
-      print(paste("error url::", e))
-      #print(result.df)
-      #print(rts)
-    }
-  )
-  
-  
-  #prepare row to export
-  total.followers <- user.followers+total.repin.follower
-  row <- data.frame(as.character(user.username), as.character(url), pin.likes, pin.comments, pin.repins, user.followers, total.repin.follower, total.followers, repins.count)
-  report.df <- rbind(report.df, row)
+      ,error = function(e) { 
+        print(paste("error url::", e))
+        #print(result.df)
+        #print(rts)
+      }
+    )
+    
+    
+    #prepare row to export
+    total.followers <- user.followers+total.repin.follower
+    row <- data.frame(as.character(user.username), as.character(url), pin.likes, pin.comments, pin.repins, user.followers, total.repin.follower, total.followers, repins.count, pin.created)
+    report.df <- rbind(report.df, row)
+  }
+}else{
+  print("No PIN links present - exporting empty data frame")
 }
 
 #write output csv ; export
-colnames(report.df) <- c("username", "url", "likes", "comments", "repins", "user followers", "repin followers", "total followers", "repin boards")
+colnames(report.df) <- c("username", "url", "likes", "comments", "repins", "user followers", "repin followers", "total followers", "repin boards", "created")
 write.csv(report.df, file = "export-pinterest.csv", row.names = F)
 print("FINISHED! Exported to export-pinterest.csv")
 
