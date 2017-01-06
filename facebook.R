@@ -65,7 +65,24 @@ if(nrow(df) != 0) #only if there is any link to analyze
       fb_angry <- 0
       fb_thankful <- 0
       fb_reaction_total <- 0
-      process_success <- "ERR"
+      code <- jsonlite::fromJSON(r)$error$code
+      if(code == 190)
+      {
+        process_success <- "Invalid OAuth 2.0 Access Token"
+      }
+      else if(code == 10)
+      {
+        process_success <- "Application does not have permission for this action"
+      }
+      else if(code == 200)
+      {
+        process_success <- "Permission error"
+      }
+      else
+      {
+        process_success <- sprintf("ERR with code %d", code)
+      }
+      
     }
     else
     {
